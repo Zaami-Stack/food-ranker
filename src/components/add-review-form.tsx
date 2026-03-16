@@ -142,12 +142,12 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
   }
 
   return (
-    <section className="panel card-3d lift-in p-5">
-      <p className="inline-flex rounded-full border border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-[rgb(var(--ink-700))]">
+    <section className="panel p-5">
+      <p className="inline-flex rounded-full border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-700))]">
         Add Review
       </p>
-      <h2 className="mt-2 text-lg font-extrabold tracking-tight text-[rgb(var(--ink-950))]">Rate A Dish</h2>
-      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Quickly score what you ate and leave a short comment.</p>
+      <h2 className="mt-2 text-lg font-bold text-[rgb(var(--ink-950))]">Rate a Dish</h2>
+      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Pick a place, rate the food, and add a short note or photo.</p>
 
       {!hasPlaces ? (
         <div className="mt-4 rounded-xl border border-dashed border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))]/75 px-3 py-4 text-sm text-[rgb(var(--ink-700))]">
@@ -280,7 +280,7 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
           <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>
         ) : null}
         {successMessage ? (
-          <p className="rounded-xl border border-[rgba(var(--teal),0.25)] bg-[rgba(var(--teal-soft),0.55)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
+          <p className="rounded-lg border border-[rgba(var(--teal),0.28)] bg-[rgba(var(--teal-soft),0.55)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
             {successMessage}
           </p>
         ) : null}

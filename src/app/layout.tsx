@@ -15,8 +15,8 @@ const codeFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FoodSpot Ranker",
-  description: "Add food places, rate dishes, and keep a shared ranking board with your friends.",
+  title: "Anas & Saad Space",
+  description: "Simple shared food tracker for Anas and Saad: add places, rate dishes, and keep rankings updated.",
 };
 
 export default function RootLayout({

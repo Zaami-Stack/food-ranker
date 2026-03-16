@@ -6,9 +6,9 @@
   --ink-950: 15 23 42;
   --ink-700: 51 65 85;
   --ink-500: 100 116 139;
-  --line: 205 217 236;
+  --line: 226 232 240;
   --surface-1: 255 255 255;
-  --surface-2: 240 247 255;
+  --surface-2: 248 250 252;
   --accent: 37 99 235;
   --accent-strong: 30 64 175;
   --teal: 13 148 136;
@@ -28,75 +28,30 @@ body {
   color: rgb(var(--ink-950));
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   background:
-    radial-gradient(circle at 8% 6%, rgba(125, 211, 252, 0.34), transparent 30%),
-    radial-gradient(circle at 90% 4%, rgba(96, 165, 250, 0.24), transparent 34%),
-    linear-gradient(180deg, rgb(238 245 255) 0%, rgb(246 250 255) 38%, rgb(239 246 255) 100%);
-}
-
-main::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 30px 30px;
-  mask-image: radial-gradient(circle at 50% 10%, black 35%, transparent 90%);
+    radial-gradient(circle at 10% 0%, rgba(125, 211, 252, 0.24), transparent 32%),
+    radial-gradient(circle at 90% 12%, rgba(16, 185, 129, 0.12), transparent 26%),
+    rgb(244 248 252);
 }
 
 .panel {
-  position: relative;
-  border: 1px solid rgba(var(--line), 0.85);
-  border-radius: 1.3rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.86));
-  box-shadow:
-    0 30px 44px -35px rgba(37, 99, 235, 0.6),
-    0 12px 22px -18px rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(10px);
-}
-
-.panel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.6), transparent 42%);
+  border: 1px solid rgba(var(--line), 1);
+  border-radius: 1rem;
+  background: rgb(var(--surface-1));
+  box-shadow: 0 8px 20px -18px rgba(15, 23, 42, 0.5);
 }
 
 .card-3d {
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
-}
-
-.card-3d::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.74), transparent 50%);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .card-3d:hover {
-    transform: perspective(1000px) rotateX(4deg) rotateY(-4deg) translateY(-5px) translateZ(0);
-    box-shadow:
-      0 34px 48px -34px rgba(37, 99, 235, 0.58),
-      0 20px 26px -20px rgba(15, 23, 42, 0.42);
-  }
+  transform: none;
 }
 
 .lift-in {
-  animation: lift-in 530ms cubic-bezier(0.2, 0.72, 0.19, 0.99) both;
+  animation: fade-up 280ms ease both;
 }
 
 .app-label {
   display: block;
-  font-size: 0.79rem;
-  font-weight: 700;
-  letter-spacing: 0.015em;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: rgb(var(--ink-700));
 }
 
@@ -105,22 +60,22 @@ main::before {
 .app-textarea {
   width: 100%;
   border: 1px solid rgba(var(--line), 1);
-  border-radius: 0.95rem;
-  background: rgba(255, 255, 255, 0.92);
+  border-radius: 0.75rem;
+  background: rgb(var(--surface-1));
   color: rgb(var(--ink-950));
   outline: none;
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .app-field,
 .app-select {
-  min-height: 2.85rem;
-  padding: 0.56rem 0.86rem;
+  min-height: 2.9rem;
+  padding: 0.62rem 0.82rem;
 }
 
 .app-textarea {
-  min-height: 6.2rem;
-  padding: 0.62rem 0.86rem;
+  min-height: 6rem;
+  padding: 0.62rem 0.82rem;
   resize: vertical;
 }
 
@@ -132,80 +87,52 @@ main::before {
 .app-field:focus,
 .app-select:focus,
 .app-textarea:focus {
-  border-color: rgba(var(--accent), 0.9);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
-  transform: translateY(-1px);
+  border-color: rgba(var(--accent), 0.85);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
 }
 
 .app-btn {
   width: 100%;
   min-height: 2.95rem;
-  border-radius: 0.95rem;
-  padding: 0.6rem 1rem;
-  font-size: 0.91rem;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  transition: transform 190ms ease, box-shadow 190ms ease, filter 190ms ease;
+  border-radius: 0.75rem;
+  padding: 0.62rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: filter 160ms ease, opacity 160ms ease;
+}
+
+.app-btn:hover:not(:disabled) {
+  filter: brightness(0.98);
 }
 
 .app-btn:disabled {
   cursor: not-allowed;
-  opacity: 0.62;
-}
-
-.app-btn:active:not(:disabled) {
-  transform: translateY(1px);
+  opacity: 0.6;
 }
 
 .app-btn-primary {
   color: white;
-  background: linear-gradient(135deg, rgb(var(--accent)) 0%, rgb(var(--accent-strong)) 100%);
-  box-shadow:
-    0 18px 26px -19px rgba(37, 99, 235, 0.9),
-    0 8px 16px -12px rgba(15, 23, 42, 0.55);
+  background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)));
 }
 
 .app-btn-dark {
   color: white;
-  background: linear-gradient(135deg, rgb(30 41 59), rgb(15 23 42));
-  box-shadow:
-    0 18px 26px -20px rgba(30, 41, 59, 0.84),
-    0 8px 16px -12px rgba(15, 23, 42, 0.55);
+  background: rgb(30 41 59);
 }
 
-.segment-wrap {
-  border: 1px solid rgba(var(--line), 0.95);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.88);
-  padding: 0.25rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.26rem;
-}
-
-.segment-item {
-  min-height: 2.35rem;
-  border-radius: 0.78rem;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  color: rgb(var(--ink-700));
-  transition: transform 170ms ease, background-color 170ms ease, color 170ms ease;
-}
-
+.segment-wrap,
+.segment-item,
 .segment-item-active {
-  background: rgb(var(--accent));
-  color: white;
-  box-shadow: 0 14px 22px -18px rgba(37, 99, 235, 0.85);
+  all: unset;
 }
 
-@keyframes lift-in {
+@keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.995);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
