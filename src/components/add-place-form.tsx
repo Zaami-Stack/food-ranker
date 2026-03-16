@@ -76,16 +76,12 @@ export function AddPlaceForm({ onCreated }: AddPlaceFormProps) {
   }
 
   return (
-    <section className="panel lift-in rounded-[1.35rem] p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="inline-flex rounded-full border border-[rgba(var(--line),0.9)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.13em] text-[rgb(var(--ink-700))]">
-            Add Place
-          </p>
-          <h2 className="mt-2 text-lg font-extrabold tracking-tight text-[rgb(var(--ink-900))]">Save A New Food Spot</h2>
-        </div>
-      </div>
-      <p className="mt-2 text-sm text-[rgb(var(--ink-500))]">Drop the exact place where you ate so your ranking board keeps growing.</p>
+    <section className="panel card-3d lift-in p-5">
+      <p className="inline-flex rounded-full border border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-[rgb(var(--ink-700))]">
+        Add Place
+      </p>
+      <h2 className="mt-2 text-lg font-extrabold tracking-tight text-[rgb(var(--ink-950))]">Save A New Spot</h2>
+      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Add the place once, then keep updating ratings over time.</p>
 
       <form className="mt-4 space-y-3.5" onSubmit={handleSubmit}>
         <label className="app-label" htmlFor="place-name">
@@ -149,7 +145,7 @@ export function AddPlaceForm({ onCreated }: AddPlaceFormProps) {
           <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>
         ) : null}
         {successMessage ? (
-          <p className="rounded-xl border border-[rgba(var(--teal),0.25)] bg-[rgba(var(--teal-soft),0.55)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
+          <p className="rounded-xl border border-[rgba(var(--teal),0.22)] bg-[rgba(var(--teal-soft),0.65)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
             {successMessage}
           </p>
         ) : null}

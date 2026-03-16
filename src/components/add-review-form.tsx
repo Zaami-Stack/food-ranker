@@ -107,16 +107,12 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
   }
 
   return (
-    <section className="panel lift-in rounded-[1.35rem] p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="inline-flex rounded-full border border-[rgba(var(--line),0.9)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.13em] text-[rgb(var(--ink-700))]">
-            Add Review
-          </p>
-          <h2 className="mt-2 text-lg font-extrabold tracking-tight text-[rgb(var(--ink-900))]">Score The Food</h2>
-        </div>
-      </div>
-      <p className="mt-2 text-sm text-[rgb(var(--ink-500))]">Review a dish and leave a comment so your top places stay accurate.</p>
+    <section className="panel card-3d lift-in p-5">
+      <p className="inline-flex rounded-full border border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-[rgb(var(--ink-700))]">
+        Add Review
+      </p>
+      <h2 className="mt-2 text-lg font-extrabold tracking-tight text-[rgb(var(--ink-950))]">Rate A Dish</h2>
+      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Quickly score what you ate and leave a short comment.</p>
 
       {!hasPlaces ? (
         <div className="mt-4 rounded-xl border border-dashed border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))]/75 px-3 py-4 text-sm text-[rgb(var(--ink-700))]">
