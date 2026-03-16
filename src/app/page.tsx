@@ -1,5 +1,5 @@
-import { PlacesDashboard } from "@/components/places-dashboard";
+import { FoodEntriesDashboard } from "@/components/food-entries-dashboard";
 
 export default function Home() {
-  return <PlacesDashboard />;
+  return <FoodEntriesDashboard />;
 }

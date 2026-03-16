@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { placeInputSchema, reviewInputSchema } from "@/lib/schemas";
+import { foodEntryInputSchema, placeInputSchema, reviewInputSchema } from "@/lib/schemas";
 
 describe("placeInputSchema", () => {
   it("accepts valid place payloads", () => {
@@ -61,6 +61,34 @@ describe("reviewInputSchema", () => {
       rating: 5,
       imageUrl: "not-a-url",
       reviewerName: "Friend",
+    });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("foodEntryInputSchema", () => {
+  it("accepts valid food entries", () => {
+    const result = foodEntryInputSchema.safeParse({
+      foodName: "Chicken Shawarma",
+      sourcePlace: "Old Town",
+      imageUrl: "https://example.com/food.jpg",
+      saadRating: "4",
+      anasRating: 5,
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.saadRating).toBe(4);
+    }
+  });
+
+  it("rejects ratings outside range", () => {
+    const result = foodEntryInputSchema.safeParse({
+      foodName: "Chicken Shawarma",
+      sourcePlace: "Old Town",
+      saadRating: 0,
+      anasRating: 6,
     });
 
     expect(result.success).toBe(false);

@@ -44,9 +44,18 @@ export const reviewInputSchema = z.object({
   reviewerName: cleanString(2, 40, "Reviewer name"),
 });
 
+export const foodEntryInputSchema = z.object({
+  foodName: cleanString(2, 80, "Food name"),
+  sourcePlace: cleanString(2, 120, "Where you got it"),
+  imageUrl: optionalUrl("Photo URL"),
+  saadRating: z.coerce.number().int().min(1, "Saad rating must be between 1 and 5.").max(5, "Saad rating must be between 1 and 5."),
+  anasRating: z.coerce.number().int().min(1, "Anas rating must be between 1 and 5.").max(5, "Anas rating must be between 1 and 5."),
+});
+
 export const placeIdParamsSchema = z.object({
   placeId: z.string().uuid("Invalid place id."),
 });
 
 export type PlaceInput = z.infer<typeof placeInputSchema>;
 export type ReviewInput = z.infer<typeof reviewInputSchema>;
+export type FoodEntryInput = z.infer<typeof foodEntryInputSchema>;

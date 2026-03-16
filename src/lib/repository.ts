@@ -1,7 +1,7 @@
 import { getAverageRating, sortPlacesForRanking } from "@/lib/ranking";
-import type { PlaceInput, ReviewInput } from "@/lib/schemas";
+import type { FoodEntryInput, PlaceInput, ReviewInput } from "@/lib/schemas";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
-import type { Place, PlaceDetails, PlaceWithStats, Review } from "@/lib/types";
+import type { FoodEntry, Place, PlaceDetails, PlaceWithStats, Review } from "@/lib/types";
 
 type DbError = {
   code?: string;
@@ -38,9 +38,20 @@ type ReviewRowLegacy = {
   created_at: string;
 };
 
+type FoodEntryRow = {
+  id: string;
+  food_name: string;
+  source_place: string;
+  image_url: string | null;
+  saad_rating: number;
+  anas_rating: number;
+  created_at: string;
+};
+
 const PLACE_COLUMNS = "id, name, location, cuisine, added_by, created_at";
 const REVIEW_COLUMNS = "id, place_id, food_name, rating, comment, image_url, reviewer_name, created_at";
 const REVIEW_COLUMNS_LEGACY = "id, place_id, food_name, rating, comment, reviewer_name, created_at";
+const FOOD_ENTRY_COLUMNS = "id, food_name, source_place, image_url, saad_rating, anas_rating, created_at";
 
 export class RepositoryError extends Error {
   constructor(
@@ -73,6 +84,20 @@ function toReview(row: ReviewRow | ReviewRowLegacy): Review {
     comment: row.comment,
     imageUrl: "image_url" in row ? row.image_url : null,
     reviewerName: row.reviewer_name,
+    createdAt: row.created_at,
+  };
+}
+
+function toFoodEntry(row: FoodEntryRow): FoodEntry {
+  const average = (row.saad_rating + row.anas_rating) / 2;
+  return {
+    id: row.id,
+    foodName: row.food_name,
+    sourcePlace: row.source_place,
+    imageUrl: row.image_url,
+    saadRating: row.saad_rating,
+    anasRating: row.anas_rating,
+    averageRating: Number(average.toFixed(2)),
     createdAt: row.created_at,
   };
 }
@@ -302,4 +327,43 @@ export async function createReview(input: ReviewInput): Promise<Review> {
   }
 
   return toReview(data as ReviewRow);
+}
+
+export async function listFoodEntries(): Promise<FoodEntry[]> {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase.from("food_entries").select(FOOD_ENTRY_COLUMNS).order("created_at", { ascending: false });
+
+  if (error) {
+    throw toRepositoryError(error as DbError, "read");
+  }
+
+  const entries = (data as FoodEntryRow[] | null)?.map(toFoodEntry) ?? [];
+  return entries.sort((a, b) => {
+    if (b.averageRating !== a.averageRating) {
+      return b.averageRating - a.averageRating;
+    }
+
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+}
+
+export async function createFoodEntry(input: FoodEntryInput): Promise<FoodEntry> {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("food_entries")
+    .insert({
+      food_name: input.foodName,
+      source_place: input.sourcePlace,
+      image_url: input.imageUrl ?? null,
+      saad_rating: input.saadRating,
+      anas_rating: input.anasRating,
+    })
+    .select(FOOD_ENTRY_COLUMNS)
+    .single();
+
+  if (error) {
+    throw toRepositoryError(error as DbError, "write");
+  }
+
+  return toFoodEntry(data as FoodEntryRow);
 }

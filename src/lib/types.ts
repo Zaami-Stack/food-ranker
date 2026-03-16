@@ -49,3 +49,14 @@ export type PlaceWithStats = Place & {
 export type PlaceDetails = PlaceWithStats & {
   reviews: Review[];
 };
+
+export type FoodEntry = {
+  id: string;
+  foodName: string;
+  sourcePlace: string;
+  imageUrl: string | null;
+  saadRating: number;
+  anasRating: number;
+  averageRating: number;
+  createdAt: string;
+};
