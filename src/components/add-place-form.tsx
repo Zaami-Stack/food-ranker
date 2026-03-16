@@ -76,78 +76,85 @@ export function AddPlaceForm({ onCreated }: AddPlaceFormProps) {
   }
 
   return (
-    <section className="panel fade-up rounded-2xl p-5 shadow-soft">
-      <h2 className="text-lg font-bold text-stone-900">Add New Place</h2>
-      <p className="mt-1 text-sm text-stone-600">Save a restaurant or street food stop that you both want to track.</p>
+    <section className="panel lift-in rounded-[1.35rem] p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="inline-flex rounded-full border border-[rgba(var(--line),0.9)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.13em] text-[rgb(var(--ink-700))]">
+            Add Place
+          </p>
+          <h2 className="mt-2 text-lg font-extrabold tracking-tight text-[rgb(var(--ink-900))]">Save A New Food Spot</h2>
+        </div>
+      </div>
+      <p className="mt-2 text-sm text-[rgb(var(--ink-500))]">Drop the exact place where you ate so your ranking board keeps growing.</p>
 
-      <form className="mt-4 space-y-3" onSubmit={handleSubmit}>
-        <label className="block text-sm font-medium text-stone-800" htmlFor="place-name">
+      <form className="mt-4 space-y-3.5" onSubmit={handleSubmit}>
+        <label className="app-label" htmlFor="place-name">
           Place Name
         </label>
         <input
           id="place-name"
           value={draft.name}
           onChange={(event) => setDraft((prev) => ({ ...prev, name: event.target.value }))}
-          className="w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+          className="app-field"
           maxLength={80}
           required
-          placeholder="Casa Tacos"
+          placeholder="Casa Tacos, Grill Hub, etc."
         />
 
-        <label className="block text-sm font-medium text-stone-800" htmlFor="place-location">
+        <label className="app-label" htmlFor="place-location">
           Location
         </label>
         <input
           id="place-location"
           value={draft.location}
           onChange={(event) => setDraft((prev) => ({ ...prev, location: event.target.value }))}
-          className="w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+          className="app-field"
           maxLength={120}
           required
-          placeholder="Downtown, near the train station"
+          placeholder="District, landmark, or map pin area"
         />
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-stone-800" htmlFor="place-cuisine">
+            <label className="app-label" htmlFor="place-cuisine">
               Cuisine (Optional)
             </label>
             <input
               id="place-cuisine"
               value={draft.cuisine}
               onChange={(event) => setDraft((prev) => ({ ...prev, cuisine: event.target.value }))}
-              className="mt-1 w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+              className="app-field mt-1"
               maxLength={50}
-              placeholder="Mexican"
+              placeholder="Mexican, Asian, Burgers"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-stone-800" htmlFor="place-added-by">
+            <label className="app-label" htmlFor="place-added-by">
               Your Name
             </label>
             <input
               id="place-added-by"
               value={draft.addedBy}
               onChange={(event) => setDraft((prev) => ({ ...prev, addedBy: event.target.value }))}
-              className="mt-1 w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+              className="app-field mt-1"
               maxLength={40}
               required
-              placeholder="Vinsx"
+              placeholder="Your name"
             />
           </div>
         </div>
 
-        {error ? <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+        {error ? (
+          <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>
+        ) : null}
         {successMessage ? (
-          <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>
+          <p className="rounded-xl border border-[rgba(var(--teal),0.25)] bg-[rgba(var(--teal-soft),0.55)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
+            {successMessage}
+          </p>
         ) : null}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-lg bg-[rgb(var(--brand-accent))] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-        >
+        <button type="submit" disabled={isSubmitting} className="app-btn app-btn-primary">
           {isSubmitting ? "Adding place..." : "Add Place"}
         </button>
       </form>

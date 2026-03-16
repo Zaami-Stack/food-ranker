@@ -107,25 +107,32 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
   }
 
   return (
-    <section className="panel fade-up rounded-2xl p-5 shadow-soft">
-      <h2 className="text-lg font-bold text-stone-900">Add Food Review</h2>
-      <p className="mt-1 text-sm text-stone-600">Rate a dish and leave a comment so your ranking stays up to date.</p>
+    <section className="panel lift-in rounded-[1.35rem] p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="inline-flex rounded-full border border-[rgba(var(--line),0.9)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.13em] text-[rgb(var(--ink-700))]">
+            Add Review
+          </p>
+          <h2 className="mt-2 text-lg font-extrabold tracking-tight text-[rgb(var(--ink-900))]">Score The Food</h2>
+        </div>
+      </div>
+      <p className="mt-2 text-sm text-[rgb(var(--ink-500))]">Review a dish and leave a comment so your top places stay accurate.</p>
 
       {!hasPlaces ? (
-        <div className="mt-4 rounded-lg border border-dashed border-[rgb(var(--brand-border))] bg-amber-50/50 px-3 py-4 text-sm text-stone-700">
+        <div className="mt-4 rounded-xl border border-dashed border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))]/75 px-3 py-4 text-sm text-[rgb(var(--ink-700))]">
           Add at least one place first before posting reviews.
         </div>
       ) : null}
 
-      <form className="mt-4 space-y-3" onSubmit={handleSubmit}>
-        <label className="block text-sm font-medium text-stone-800" htmlFor="review-place">
+      <form className="mt-4 space-y-3.5" onSubmit={handleSubmit}>
+        <label className="app-label" htmlFor="review-place">
           Place
         </label>
         <select
           id="review-place"
           value={draft.placeId}
           onChange={(event) => setDraft((prev) => ({ ...prev, placeId: event.target.value }))}
-          className="w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+          className="app-select"
           required
           disabled={!hasPlaces}
         >
@@ -136,14 +143,14 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
           ))}
         </select>
 
-        <label className="block text-sm font-medium text-stone-800" htmlFor="review-food-name">
+        <label className="app-label" htmlFor="review-food-name">
           Food Name
         </label>
         <input
           id="review-food-name"
           value={draft.foodName}
           onChange={(event) => setDraft((prev) => ({ ...prev, foodName: event.target.value }))}
-          className="w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+          className="app-field"
           placeholder="Chicken Shawarma"
           maxLength={80}
           required
@@ -152,14 +159,14 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-stone-800" htmlFor="review-rating">
+            <label className="app-label" htmlFor="review-rating">
               Rating (1-5)
             </label>
             <select
               id="review-rating"
               value={draft.rating}
               onChange={(event) => setDraft((prev) => ({ ...prev, rating: Number(event.target.value) }))}
-              className="mt-1 w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+              className="app-select mt-1"
               disabled={!hasPlaces}
             >
               {[5, 4, 3, 2, 1].map((rating) => (
@@ -171,14 +178,14 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-stone-800" htmlFor="reviewer-name">
+            <label className="app-label" htmlFor="reviewer-name">
               Your Name
             </label>
             <input
               id="reviewer-name"
               value={draft.reviewerName}
               onChange={(event) => setDraft((prev) => ({ ...prev, reviewerName: event.target.value }))}
-              className="mt-1 w-full rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+              className="app-field mt-1"
               placeholder="Friend name"
               maxLength={40}
               required
@@ -187,29 +194,29 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
           </div>
         </div>
 
-        <label className="block text-sm font-medium text-stone-800" htmlFor="review-comment">
+        <label className="app-label" htmlFor="review-comment">
           Comment (Optional)
         </label>
         <textarea
           id="review-comment"
           value={draft.comment}
           onChange={(event) => setDraft((prev) => ({ ...prev, comment: event.target.value }))}
-          className="h-24 w-full resize-y rounded-lg border border-[rgb(var(--brand-border))] bg-white px-3 py-2 text-sm text-stone-900 outline-none transition focus:border-[rgb(var(--brand-accent))] focus:ring-2 focus:ring-orange-100"
+          className="app-textarea"
           placeholder="Crispy fries, very good sauce."
           maxLength={280}
           disabled={!hasPlaces}
         />
 
-        {error ? <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+        {error ? (
+          <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>
+        ) : null}
         {successMessage ? (
-          <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>
+          <p className="rounded-xl border border-[rgba(var(--teal),0.25)] bg-[rgba(var(--teal-soft),0.55)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
+            {successMessage}
+          </p>
         ) : null}
 
-        <button
-          type="submit"
-          disabled={!hasPlaces || isSubmitting}
-          className="w-full rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
-        >
+        <button type="submit" disabled={!hasPlaces || isSubmitting} className="app-btn app-btn-dark">
           {isSubmitting ? "Submitting..." : "Add Review"}
         </button>
       </form>
