@@ -163,7 +163,7 @@ export function FoodEntriesDashboard() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8">
       <header className="hero-shell panel lift-in p-5 sm:p-6">
-        <p className="inline-flex rounded-full border border-[rgba(var(--accent),0.28)] bg-[rgba(var(--surface-2),0.9)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--accent))]">
+        <p className="inline-flex rounded-full border border-[rgba(var(--accent),0.5)] bg-[rgba(var(--surface-2),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--accent))]">
           Anas And Saad Space
         </p>
         <h1 className="mt-3 text-3xl font-bold leading-tight text-[rgb(var(--ink-950))] sm:text-4xl">Food Rating Journal</h1>
@@ -191,7 +191,7 @@ export function FoodEntriesDashboard() {
 
       <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(320px,390px)_1fr]">
         <section className="panel lift-in p-5">
-          <p className="inline-flex rounded-full border border-[rgba(var(--teal),0.3)] bg-[rgba(var(--teal-soft),0.45)] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--teal))]">
+          <p className="inline-flex rounded-full border border-[rgba(var(--teal),0.45)] bg-[rgba(var(--teal-soft),0.38)] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--teal))]">
             New Food
           </p>
           <h2 className="mt-2 text-xl font-bold text-[rgb(var(--ink-950))]">Add One Entry</h2>
@@ -277,7 +277,7 @@ export function FoodEntriesDashboard() {
             </div>
 
             {photoPreviewUrl ? (
-              <div className="rounded-lg border border-[rgba(var(--line),1)] bg-white p-2">
+              <div className="rounded-lg border border-[rgba(var(--line),0.75)] bg-[rgba(var(--surface-2),0.6)] p-2">
                 <div
                   className="h-40 w-full rounded-lg bg-cover bg-center"
                   style={{ backgroundImage: `url("${photoPreviewUrl}")` }}
@@ -287,7 +287,7 @@ export function FoodEntriesDashboard() {
                 <button
                   type="button"
                   onClick={clearPhoto}
-                  className="mt-2 rounded-lg border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-3 py-1.5 text-xs font-bold text-[rgb(var(--ink-700))]"
+                  className="mt-2 rounded-lg border border-[rgba(var(--line),0.75)] bg-[rgba(var(--surface-1),0.75)] px-3 py-1.5 text-xs font-bold text-[rgb(var(--ink-700))]"
                   disabled={isSubmitting}
                 >
                   Remove Image
@@ -297,7 +297,7 @@ export function FoodEntriesDashboard() {
 
             {error ? <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p> : null}
             {successMessage ? (
-              <p className="rounded-lg border border-[rgba(var(--teal),0.28)] bg-[rgba(var(--teal-soft),0.65)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
+              <p className="rounded-lg border border-[rgba(var(--teal),0.45)] bg-[rgba(var(--teal-soft),0.42)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
                 {successMessage}
               </p>
             ) : null}
@@ -318,7 +318,7 @@ export function FoodEntriesDashboard() {
               type="button"
               onClick={() => void loadEntries("refresh")}
               disabled={isRefreshing}
-              className="rounded-lg border border-[rgba(var(--accent),0.28)] bg-[rgba(var(--surface-2),0.85)] px-3 py-2 text-sm font-semibold text-[rgb(var(--accent))] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg border border-[rgba(var(--accent),0.45)] bg-[rgba(var(--surface-2),0.72)] px-3 py-2 text-sm font-semibold text-[rgb(var(--accent))] transition hover:bg-[rgba(var(--surface-2),0.95)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isRefreshing ? "Refreshing..." : "Refresh"}
             </button>
@@ -327,13 +327,13 @@ export function FoodEntriesDashboard() {
           {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="h-44 animate-pulse rounded-xl border border-[rgba(var(--line),0.95)] bg-white" />
+                <div key={index} className="h-44 animate-pulse rounded-xl border border-[rgba(var(--line),0.65)] bg-[rgba(var(--surface-2),0.65)]" />
               ))}
             </div>
           ) : null}
 
           {!isLoading && entries.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-4 py-8 text-center">
+            <div className="rounded-xl border border-dashed border-[rgba(var(--line),0.72)] bg-[rgba(var(--surface-2),0.65)] px-4 py-8 text-center">
               <p className="text-base font-semibold text-[rgb(var(--ink-950))]">No food entries yet</p>
               <p className="mt-1 text-sm text-[rgb(var(--ink-500))]">Add your first food now.</p>
             </div>
@@ -370,7 +370,7 @@ export function FoodEntriesDashboard() {
                           <p className="text-[0.64rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Anas</p>
                           <p className="mt-1 text-lg font-bold text-[rgb(var(--ink-950))]">{entry.anasRating}</p>
                         </div>
-                        <div className="rounded-lg border border-[rgba(var(--accent),0.28)] bg-[rgba(var(--surface-2),0.95)] px-2.5 py-2 text-center">
+                        <div className="rounded-lg border border-[rgba(var(--accent),0.45)] bg-[rgba(var(--surface-2),0.82)] px-2.5 py-2 text-center">
                           <p className="text-[0.64rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--accent))]">Average</p>
                           <p className="mt-1 text-lg font-bold text-[rgb(var(--accent))]">{entry.averageRating}</p>
                         </div>
