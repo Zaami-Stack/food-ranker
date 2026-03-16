@@ -1,5 +1,5 @@
 import { getAverageRating, sortPlacesForRanking } from "@/lib/ranking";
-import type { FoodEntryInput, PlaceInput, ReviewInput } from "@/lib/schemas";
+import type { FoodEntryInput, FoodEntryRatingsUpdateInput, PlaceInput, ReviewInput } from "@/lib/schemas";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import type { FoodEntry, Place, PlaceDetails, PlaceWithStats, Review } from "@/lib/types";
 
@@ -56,7 +56,7 @@ const FOOD_ENTRY_COLUMNS = "id, food_name, source_place, image_url, saad_rating,
 export class RepositoryError extends Error {
   constructor(
     message: string,
-    public code: "PLACE_EXISTS" | "PLACE_NOT_FOUND" | "DB_READ_FAILED" | "DB_WRITE_FAILED",
+    public code: "PLACE_EXISTS" | "PLACE_NOT_FOUND" | "FOOD_ENTRY_NOT_FOUND" | "DB_READ_FAILED" | "DB_WRITE_FAILED",
     public status: number,
   ) {
     super(message);
@@ -363,6 +363,36 @@ export async function createFoodEntry(input: FoodEntryInput): Promise<FoodEntry>
 
   if (error) {
     throw toRepositoryError(error as DbError, "write");
+  }
+
+  return toFoodEntry(data as FoodEntryRow);
+}
+
+export async function updateFoodEntryRatings(entryId: string, input: FoodEntryRatingsUpdateInput): Promise<FoodEntry> {
+  const supabase = getSupabaseAdminClient();
+  const updatePayload: { saad_rating?: number; anas_rating?: number } = {};
+
+  if (typeof input.saadRating === "number") {
+    updatePayload.saad_rating = input.saadRating;
+  }
+
+  if (typeof input.anasRating === "number") {
+    updatePayload.anas_rating = input.anasRating;
+  }
+
+  const { data, error } = await supabase
+    .from("food_entries")
+    .update(updatePayload)
+    .eq("id", entryId)
+    .select(FOOD_ENTRY_COLUMNS)
+    .maybeSingle();
+
+  if (error) {
+    throw toRepositoryError(error as DbError, "write");
+  }
+
+  if (!data) {
+    throw new RepositoryError("Food entry not found.", "FOOD_ENTRY_NOT_FOUND", 404);
   }
 
   return toFoodEntry(data as FoodEntryRow);

@@ -9,7 +9,7 @@ const WRITE_LIMIT = 45;
 const WINDOW_MS = 60_000;
 
 function mapRepositoryError(error: RepositoryError) {
-  if (error.code === "PLACE_NOT_FOUND") {
+  if (error.code === "PLACE_NOT_FOUND" || error.code === "FOOD_ENTRY_NOT_FOUND") {
     return fail("NOT_FOUND", error.message, error.status);
   }
 

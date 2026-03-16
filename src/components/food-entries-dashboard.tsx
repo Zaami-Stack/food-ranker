@@ -11,6 +11,10 @@ type EntryCreatePayload = {
   entry: FoodEntry;
 };
 
+type EntryUpdatePayload = {
+  entry: FoodEntry;
+};
+
 type FoodEntryDraft = {
   foodName: string;
   sourcePlace: string;
@@ -18,7 +22,22 @@ type FoodEntryDraft = {
   anasRating: number;
 };
 
+type RatingDraft = {
+  saadRating: number;
+  anasRating: number;
+};
+
+type RatingPickerProps = {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  idPrefix: string;
+  disabled?: boolean;
+  compact?: boolean;
+};
+
 const PHOTO_ACCEPT_TYPES = "image/jpeg,image/png,image/webp,image/heic,image/heif";
+const RATING_OPTIONS = [1, 2, 3, 4, 5] as const;
 
 const initialDraft: FoodEntryDraft = {
   foodName: "",
@@ -50,23 +69,68 @@ function formatDate(dateValue: string) {
   });
 }
 
+function RatingPicker({ label, value, onChange, idPrefix, disabled = false, compact = false }: RatingPickerProps) {
+  return (
+    <div>
+      <p className="app-label">{label}</p>
+      <div className={`mt-2 flex ${compact ? "gap-1.5" : "gap-2"}`} role="group" aria-label={label}>
+        {RATING_OPTIONS.map((rating) => {
+          const selected = value === rating;
+          return (
+            <button
+              key={`${idPrefix}-${rating}`}
+              type="button"
+              onClick={() => onChange(rating)}
+              disabled={disabled}
+              className={[
+                "rounded-lg border font-bold transition",
+                compact ? "h-8 w-8 text-xs" : "h-9 w-9 text-sm",
+                selected
+                  ? "border-[rgba(var(--accent),0.75)] bg-[rgba(var(--accent),0.2)] text-[rgb(var(--ink-950))]"
+                  : "border-[rgba(var(--line),0.72)] bg-[rgba(var(--surface-1),0.75)] text-[rgb(var(--ink-700))] hover:border-[rgba(var(--accent),0.45)]",
+                disabled ? "cursor-not-allowed opacity-60" : "",
+              ].join(" ")}
+              aria-pressed={selected}
+            >
+              {rating}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function FoodEntriesDashboard() {
   const [entries, setEntries] = useState<FoodEntry[]>([]);
   const [draft, setDraft] = useState<FoodEntryDraft>(initialDraft);
+  const [ratingDraftByEntryId, setRatingDraftByEntryId] = useState<Record<string, RatingDraft>>({});
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [savingEntryId, setSavingEntryId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [entryErrorById, setEntryErrorById] = useState<Record<string, string>>({});
+  const [entrySuccessById, setEntrySuccessById] = useState<Record<string, string>>({});
 
-  const averageOfAverages = useMemo(() => {
+  const saadAverage = useMemo(() => {
     if (entries.length === 0) {
       return null;
     }
 
-    const total = entries.reduce((sum, entry) => sum + entry.averageRating, 0);
+    const total = entries.reduce((sum, entry) => sum + entry.saadRating, 0);
+    return Number((total / entries.length).toFixed(2));
+  }, [entries]);
+
+  const anasAverage = useMemo(() => {
+    if (entries.length === 0) {
+      return null;
+    }
+
+    const total = entries.reduce((sum, entry) => sum + entry.anasRating, 0);
     return Number((total / entries.length).toFixed(2));
   }, [entries]);
 
@@ -80,6 +144,17 @@ export function FoodEntriesDashboard() {
     setPhotoPreviewUrl(previewUrl);
     return () => URL.revokeObjectURL(previewUrl);
   }, [photoFile]);
+
+  useEffect(() => {
+    const nextDrafts: Record<string, RatingDraft> = {};
+    for (const entry of entries) {
+      nextDrafts[entry.id] = {
+        saadRating: entry.saadRating,
+        anasRating: entry.anasRating,
+      };
+    }
+    setRatingDraftByEntryId(nextDrafts);
+  }, [entries]);
 
   const loadEntries = useCallback(async (mode: "initial" | "refresh" = "refresh") => {
     if (mode === "initial") {
@@ -160,6 +235,38 @@ export function FoodEntriesDashboard() {
     }
   }
 
+  async function handleSaveEntryRatings(entryId: string) {
+    const draftRatings = ratingDraftByEntryId[entryId];
+    if (!draftRatings) {
+      return;
+    }
+
+    setSavingEntryId(entryId);
+    setEntryErrorById((prev) => ({ ...prev, [entryId]: "" }));
+    setEntrySuccessById((prev) => ({ ...prev, [entryId]: "" }));
+
+    try {
+      const response = await fetch(`/api/food-entries/${entryId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draftRatings),
+      });
+
+      const payload = (await response.json()) as ApiSuccess<EntryUpdatePayload> | ApiFailure;
+      if (!response.ok || !payload.success) {
+        throw new Error(getErrorMessage(payload.success ? undefined : payload, "Could not update ratings."));
+      }
+
+      setEntries((prev) => prev.map((entry) => (entry.id === entryId ? payload.data.entry : entry)));
+      setEntrySuccessById((prev) => ({ ...prev, [entryId]: "Ratings updated." }));
+    } catch (updateError) {
+      const message = updateError instanceof Error ? updateError.message : "Could not update ratings.";
+      setEntryErrorById((prev) => ({ ...prev, [entryId]: message }));
+    } finally {
+      setSavingEntryId(null);
+    }
+  }
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8">
       <header className="hero-shell panel lift-in p-5 sm:p-6">
@@ -178,13 +285,11 @@ export function FoodEntriesDashboard() {
           </div>
           <div className="stat-tile">
             <p className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Saad Avg</p>
-            <p className="mt-1 text-xl font-bold text-[rgb(var(--ink-950))]">
-              {entries.length === 0 ? "--" : Number((entries.reduce((sum, item) => sum + item.saadRating, 0) / entries.length).toFixed(2))}
-            </p>
+            <p className="mt-1 text-xl font-bold text-[rgb(var(--ink-950))]">{saadAverage === null ? "--" : saadAverage}</p>
           </div>
           <div className="stat-tile">
-            <p className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Overall</p>
-            <p className="mt-1 text-xl font-bold text-[rgb(var(--ink-950))]">{averageOfAverages === null ? "--" : averageOfAverages}</p>
+            <p className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Anas Avg</p>
+            <p className="mt-1 text-xl font-bold text-[rgb(var(--ink-950))]">{anasAverage === null ? "--" : anasAverage}</p>
           </div>
         </div>
       </header>
@@ -223,42 +328,21 @@ export function FoodEntriesDashboard() {
               required
             />
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="app-label" htmlFor="saad-rating">
-                  Saad Rating
-                </label>
-                <select
-                  id="saad-rating"
-                  value={draft.saadRating}
-                  onChange={(event) => setDraft((prev) => ({ ...prev, saadRating: Number(event.target.value) }))}
-                  className="app-select mt-1"
-                >
-                  {[5, 4, 3, 2, 1].map((rating) => (
-                    <option key={rating} value={rating}>
-                      {rating}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="app-label" htmlFor="anas-rating">
-                  Anas Rating
-                </label>
-                <select
-                  id="anas-rating"
-                  value={draft.anasRating}
-                  onChange={(event) => setDraft((prev) => ({ ...prev, anasRating: Number(event.target.value) }))}
-                  className="app-select mt-1"
-                >
-                  {[5, 4, 3, 2, 1].map((rating) => (
-                    <option key={rating} value={rating}>
-                      {rating}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <RatingPicker
+                label="Saad Rating"
+                value={draft.saadRating}
+                onChange={(rating) => setDraft((prev) => ({ ...prev, saadRating: rating }))}
+                idPrefix="create-saad"
+                disabled={isSubmitting}
+              />
+              <RatingPicker
+                label="Anas Rating"
+                value={draft.anasRating}
+                onChange={(rating) => setDraft((prev) => ({ ...prev, anasRating: rating }))}
+                idPrefix="create-anas"
+                disabled={isSubmitting}
+              />
             </div>
 
             <div>
@@ -295,7 +379,11 @@ export function FoodEntriesDashboard() {
               </div>
             ) : null}
 
-            {error ? <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p> : null}
+            {error ? (
+              <p className="rounded-lg border border-[rgba(248,113,113,0.6)] bg-[rgba(127,29,29,0.35)] px-3 py-2 text-sm font-medium text-red-200">
+                {error}
+              </p>
+            ) : null}
             {successMessage ? (
               <p className="rounded-lg border border-[rgba(var(--teal),0.45)] bg-[rgba(var(--teal-soft),0.42)] px-3 py-2 text-sm font-medium text-[rgb(var(--teal))]">
                 {successMessage}
@@ -327,7 +415,7 @@ export function FoodEntriesDashboard() {
           {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="h-44 animate-pulse rounded-xl border border-[rgba(var(--line),0.65)] bg-[rgba(var(--surface-2),0.65)]" />
+                <div key={index} className="h-52 animate-pulse rounded-xl border border-[rgba(var(--line),0.65)] bg-[rgba(var(--surface-2),0.65)]" />
               ))}
             </div>
           ) : null}
@@ -341,44 +429,98 @@ export function FoodEntriesDashboard() {
 
           {!isLoading && entries.length > 0 ? (
             <ul className="space-y-3">
-              {entries.map((entry) => (
-                <li key={entry.id} className="panel overflow-hidden p-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr]">
-                    <div
-                      className="h-40 w-full bg-[rgb(var(--surface-2))] bg-cover bg-center sm:h-full"
-                      style={entry.imageUrl ? { backgroundImage: `url("${entry.imageUrl}")` } : undefined}
-                      role="img"
-                      aria-label={entry.imageUrl ? `${entry.foodName} image` : "No food image"}
-                    >
-                      {!entry.imageUrl ? (
-                        <div className="flex h-full items-center justify-center text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">
-                          No Image
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="p-4">
-                      <p className="text-lg font-bold text-[rgb(var(--ink-950))]">{entry.foodName}</p>
-                      <p className="mt-1 text-sm text-[rgb(var(--ink-700))]">{entry.sourcePlace}</p>
-                      <p className="mt-1 text-xs text-[rgb(var(--ink-500))]">{formatDate(entry.createdAt)}</p>
+              {entries.map((entry) => {
+                const ratingDraft = ratingDraftByEntryId[entry.id] ?? {
+                  saadRating: entry.saadRating,
+                  anasRating: entry.anasRating,
+                };
+                const hasChanges = ratingDraft.saadRating !== entry.saadRating || ratingDraft.anasRating !== entry.anasRating;
+                const isSavingCurrent = savingEntryId === entry.id;
 
-                      <div className="mt-3 grid grid-cols-3 gap-2.5">
-                        <div className="rounded-lg border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-2.5 py-2 text-center">
-                          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Saad</p>
-                          <p className="mt-1 text-lg font-bold text-[rgb(var(--ink-950))]">{entry.saadRating}</p>
+                return (
+                  <li key={entry.id} className="panel overflow-hidden p-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr]">
+                      <div
+                        className="h-40 w-full bg-[rgb(var(--surface-2))] bg-cover bg-center sm:h-full"
+                        style={entry.imageUrl ? { backgroundImage: `url("${entry.imageUrl}")` } : undefined}
+                        role="img"
+                        aria-label={entry.imageUrl ? `${entry.foodName} image` : "No food image"}
+                      >
+                        {!entry.imageUrl ? (
+                          <div className="flex h-full items-center justify-center text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">
+                            No Image
+                          </div>
+                        ) : null}
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-lg font-bold text-[rgb(var(--ink-950))]">{entry.foodName}</p>
+                            <p className="mt-1 text-sm text-[rgb(var(--ink-700))]">{entry.sourcePlace}</p>
+                            <p className="mt-1 text-xs text-[rgb(var(--ink-500))]">{formatDate(entry.createdAt)}</p>
+                          </div>
+                          <div className="rounded-lg border border-[rgba(var(--accent),0.45)] bg-[rgba(var(--surface-2),0.82)] px-3 py-2 text-center">
+                            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--accent))]">Average</p>
+                            <p className="mt-1 text-lg font-bold text-[rgb(var(--accent))]">{entry.averageRating}</p>
+                          </div>
                         </div>
-                        <div className="rounded-lg border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-2.5 py-2 text-center">
-                          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Anas</p>
-                          <p className="mt-1 text-lg font-bold text-[rgb(var(--ink-950))]">{entry.anasRating}</p>
+
+                        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <RatingPicker
+                            label="Saad Rating"
+                            value={ratingDraft.saadRating}
+                            onChange={(rating) =>
+                              setRatingDraftByEntryId((prev) => ({
+                                ...prev,
+                                [entry.id]: {
+                                  ...ratingDraft,
+                                  saadRating: rating,
+                                },
+                              }))
+                            }
+                            idPrefix={`entry-${entry.id}-saad`}
+                            disabled={isSavingCurrent}
+                            compact
+                          />
+                          <RatingPicker
+                            label="Anas Rating"
+                            value={ratingDraft.anasRating}
+                            onChange={(rating) =>
+                              setRatingDraftByEntryId((prev) => ({
+                                ...prev,
+                                [entry.id]: {
+                                  ...ratingDraft,
+                                  anasRating: rating,
+                                },
+                              }))
+                            }
+                            idPrefix={`entry-${entry.id}-anas`}
+                            disabled={isSavingCurrent}
+                            compact
+                          />
                         </div>
-                        <div className="rounded-lg border border-[rgba(var(--accent),0.45)] bg-[rgba(var(--surface-2),0.82)] px-2.5 py-2 text-center">
-                          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--accent))]">Average</p>
-                          <p className="mt-1 text-lg font-bold text-[rgb(var(--accent))]">{entry.averageRating}</p>
+
+                        <div className="mt-3 flex flex-wrap items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => void handleSaveEntryRatings(entry.id)}
+                            disabled={isSavingCurrent || !hasChanges}
+                            className="rounded-lg border border-[rgba(var(--accent),0.5)] bg-[rgba(var(--surface-2),0.76)] px-3 py-2 text-sm font-semibold text-[rgb(var(--accent))] transition hover:bg-[rgba(var(--surface-2),0.95)] disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isSavingCurrent ? "Saving..." : "Save Ratings"}
+                          </button>
+                          {entrySuccessById[entry.id] ? (
+                            <span className="text-xs font-semibold text-[rgb(var(--teal))]">{entrySuccessById[entry.id]}</span>
+                          ) : null}
+                          {entryErrorById[entry.id] ? (
+                            <span className="text-xs font-semibold text-red-300">{entryErrorById[entry.id]}</span>
+                          ) : null}
                         </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           ) : null}
         </section>

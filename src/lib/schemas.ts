@@ -52,10 +52,27 @@ export const foodEntryInputSchema = z.object({
   anasRating: z.coerce.number().int().min(1, "Anas rating must be between 1 and 5.").max(5, "Anas rating must be between 1 and 5."),
 });
 
+const ratingNumberSchema = z.coerce.number().int().min(1, "Rating must be between 1 and 5.").max(5, "Rating must be between 1 and 5.");
+
+export const foodEntryRatingsUpdateSchema = z
+  .object({
+    saadRating: ratingNumberSchema.optional(),
+    anasRating: ratingNumberSchema.optional(),
+  })
+  .refine((value) => value.saadRating !== undefined || value.anasRating !== undefined, {
+    message: "At least one rating is required.",
+    path: ["saadRating"],
+  });
+
 export const placeIdParamsSchema = z.object({
   placeId: z.string().uuid("Invalid place id."),
+});
+
+export const foodEntryIdParamsSchema = z.object({
+  entryId: z.string().uuid("Invalid food entry id."),
 });
 
 export type PlaceInput = z.infer<typeof placeInputSchema>;
 export type ReviewInput = z.infer<typeof reviewInputSchema>;
 export type FoodEntryInput = z.infer<typeof foodEntryInputSchema>;
+export type FoodEntryRatingsUpdateInput = z.infer<typeof foodEntryRatingsUpdateSchema>;

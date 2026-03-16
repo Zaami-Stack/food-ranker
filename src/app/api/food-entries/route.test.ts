@@ -3,12 +3,12 @@ import { NextRequest } from "next/server";
 
 const { listFoodEntriesMock, createFoodEntryMock, uploadReviewPhotoMock, MockRepositoryError } = vi.hoisted(() => {
   class MockRepositoryError extends Error {
-    code: "PLACE_EXISTS" | "PLACE_NOT_FOUND" | "DB_READ_FAILED" | "DB_WRITE_FAILED";
+    code: "PLACE_EXISTS" | "PLACE_NOT_FOUND" | "FOOD_ENTRY_NOT_FOUND" | "DB_READ_FAILED" | "DB_WRITE_FAILED";
     status: number;
 
     constructor(
       message: string,
-      code: "PLACE_EXISTS" | "PLACE_NOT_FOUND" | "DB_READ_FAILED" | "DB_WRITE_FAILED",
+      code: "PLACE_EXISTS" | "PLACE_NOT_FOUND" | "FOOD_ENTRY_NOT_FOUND" | "DB_READ_FAILED" | "DB_WRITE_FAILED",
       status: number,
     ) {
       super(message);

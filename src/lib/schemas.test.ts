@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { foodEntryInputSchema, placeInputSchema, reviewInputSchema } from "@/lib/schemas";
+import { foodEntryInputSchema, foodEntryRatingsUpdateSchema, placeInputSchema, reviewInputSchema } from "@/lib/schemas";
 
 describe("placeInputSchema", () => {
   it("accepts valid place payloads", () => {
@@ -90,6 +90,22 @@ describe("foodEntryInputSchema", () => {
       saadRating: 0,
       anasRating: 6,
     });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("foodEntryRatingsUpdateSchema", () => {
+  it("accepts partial updates", () => {
+    const result = foodEntryRatingsUpdateSchema.safeParse({
+      saadRating: 5,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects empty updates", () => {
+    const result = foodEntryRatingsUpdateSchema.safeParse({});
 
     expect(result.success).toBe(false);
   });
