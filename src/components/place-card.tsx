@@ -22,30 +22,31 @@ function getProgress(score: number | null) {
 
 function getRankTone(position: number) {
   if (position === 1) {
-    return "border-amber-300 bg-amber-50 text-amber-900";
+    return "border-amber-300 bg-gradient-to-br from-amber-100 to-amber-50 text-amber-900";
   }
   if (position === 2) {
-    return "border-slate-300 bg-slate-50 text-slate-900";
+    return "border-slate-300 bg-gradient-to-br from-slate-100 to-slate-50 text-slate-900";
   }
   if (position === 3) {
-    return "border-orange-300 bg-orange-50 text-orange-900";
+    return "border-orange-300 bg-gradient-to-br from-orange-100 to-orange-50 text-orange-900";
   }
-  return "border-[rgba(var(--line),1)] bg-white text-[rgb(var(--ink-700))]";
+  return "border-[rgba(var(--line),1)] bg-gradient-to-br from-white to-[rgb(var(--surface-2))] text-[rgb(var(--ink-700))]";
 }
 
 export function PlaceCard({ place, position, highlighted = false }: PlaceCardProps) {
   return (
     <article
       className={[
-        "rounded-xl border bg-white p-4",
-        highlighted ? "border-[rgba(var(--accent),0.65)] ring-2 ring-[rgba(var(--accent),0.16)]" : "border-[rgba(var(--line),1)]",
+        "panel relative overflow-hidden p-4",
+        highlighted ? "border-[rgba(var(--accent),0.75)] ring-2 ring-[rgba(var(--accent),0.2)]" : "border-[rgba(var(--line),1)]",
       ].join(" ")}
     >
+      <div className="mb-3 h-1.5 w-28 rounded-full bg-gradient-to-r from-[rgb(var(--accent))] via-[rgb(var(--accent-strong))] to-[rgb(var(--teal))]" />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div
             className={[
-              "mb-2 inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border px-2.5 text-[0.72rem] font-bold tracking-[0.08em]",
+              "mb-2 inline-flex min-h-8 min-w-8 items-center justify-center rounded-full border px-2.5 text-[0.72rem] font-extrabold tracking-[0.08em]",
               getRankTone(position),
             ].join(" ")}
           >
@@ -59,7 +60,7 @@ export function PlaceCard({ place, position, highlighted = false }: PlaceCardPro
           </p>
         </div>
 
-        <div className="min-w-[110px] rounded-lg border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-3 py-2">
+        <div className="min-w-[112px] rounded-lg border border-[rgba(var(--line),1)] bg-gradient-to-br from-white to-[rgb(var(--surface-2))] px-3 py-2">
           <p className="text-[0.64rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-700))]">Score</p>
           <p className="mt-1 text-sm font-bold text-[rgb(var(--ink-950))]">{formatScore(place.averageRating)}</p>
           <p className="text-[0.67rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">{place.reviewCount} reviews</p>
@@ -84,7 +85,7 @@ export function PlaceCard({ place, position, highlighted = false }: PlaceCardPro
             {place.latestReviews.map((review) => (
               <li
                 key={review.id}
-                className="rounded-lg border border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))] px-3 py-2.5 text-sm"
+                className="rounded-lg border border-[rgba(var(--line),0.95)] bg-white/95 px-3 py-2.5 text-sm"
               >
                 <p className="font-semibold text-[rgb(var(--ink-950))]">
                   {review.foodName}{" "}

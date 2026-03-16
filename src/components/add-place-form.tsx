@@ -76,12 +76,12 @@ export function AddPlaceForm({ onCreated }: AddPlaceFormProps) {
   }
 
   return (
-    <section className="panel p-5">
-      <p className="inline-flex rounded-full border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-700))]">
+    <section className="panel lift-in p-5">
+      <p className="inline-flex rounded-full border border-[rgba(var(--accent),0.28)] bg-[rgba(var(--surface-2),0.88)] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--accent))]">
         Add Place
       </p>
-      <h2 className="mt-2 text-lg font-bold text-[rgb(var(--ink-950))]">Add a New Place</h2>
-      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Keep it simple: name, location, and who added it.</p>
+      <h2 className="mt-2 text-lg font-bold text-[rgb(var(--ink-950))]">Drop a New Spot</h2>
+      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Save the place once, then keep posting dishes and ratings.</p>
 
       <form className="mt-4 space-y-3.5" onSubmit={handleSubmit}>
         <label className="app-label" htmlFor="place-name">
@@ -151,7 +151,7 @@ export function AddPlaceForm({ onCreated }: AddPlaceFormProps) {
         ) : null}
 
         <button type="submit" disabled={isSubmitting} className="app-btn app-btn-primary">
-          {isSubmitting ? "Adding place..." : "Add Place"}
+          {isSubmitting ? "Saving place..." : "Save Place"}
         </button>
       </form>
     </section>

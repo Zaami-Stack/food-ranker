@@ -142,12 +142,12 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
   }
 
   return (
-    <section className="panel p-5">
-      <p className="inline-flex rounded-full border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-700))]">
+    <section className="panel lift-in p-5">
+      <p className="inline-flex rounded-full border border-[rgba(var(--teal),0.3)] bg-[rgba(var(--teal-soft),0.42)] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--teal))]">
         Add Review
       </p>
       <h2 className="mt-2 text-lg font-bold text-[rgb(var(--ink-950))]">Rate a Dish</h2>
-      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Pick a place, rate the food, and add a short note or photo.</p>
+      <p className="mt-1.5 text-sm text-[rgb(var(--ink-500))]">Give a score, add a quick comment, and attach a photo if you want.</p>
 
       {!hasPlaces ? (
         <div className="mt-4 rounded-xl border border-dashed border-[rgba(var(--line),0.95)] bg-[rgb(var(--surface-2))]/75 px-3 py-4 text-sm text-[rgb(var(--ink-700))]">
@@ -286,7 +286,7 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
         ) : null}
 
         <button type="submit" disabled={!hasPlaces || isSubmitting} className="app-btn app-btn-dark">
-          {isSubmitting ? "Submitting..." : "Add Review"}
+          {isSubmitting ? "Posting review..." : "Post Review"}
         </button>
       </form>
     </section>

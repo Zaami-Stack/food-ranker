@@ -36,17 +36,17 @@ function getErrorMessage(payload: ApiFailure | undefined, fallback: string) {
 
 function BoardSection({ places, isLoading, isRefreshing, error, highlightPlaceId, onRefresh }: BoardProps) {
   return (
-    <section id="ranking-board" className="panel p-4 sm:p-5" aria-live="polite">
+    <section id="ranking-board" className="panel lift-in p-4 sm:p-5" aria-live="polite">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Live Ranking</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Ranking Board</p>
           <h2 className="text-xl font-bold text-[rgb(var(--ink-950))]">Top Food Places</h2>
         </div>
         <button
           type="button"
           onClick={() => void onRefresh()}
           disabled={isRefreshing}
-          className="rounded-lg border border-[rgba(var(--line),1)] bg-white px-3 py-2 text-sm font-semibold text-[rgb(var(--ink-700))] transition hover:bg-[rgb(var(--surface-2))] disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-lg border border-[rgba(var(--accent),0.28)] bg-[rgba(var(--surface-2),0.85)] px-3 py-2 text-sm font-semibold text-[rgb(var(--accent))] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isRefreshing ? "Refreshing..." : "Refresh"}
         </button>
@@ -59,7 +59,10 @@ function BoardSection({ places, isLoading, isRefreshing, error, highlightPlaceId
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="h-36 animate-pulse rounded-xl border border-[rgba(var(--line),0.95)] bg-white" />
+            <div
+              key={index}
+              className="h-36 animate-pulse rounded-xl border border-[rgba(var(--line),0.95)] bg-gradient-to-br from-white to-[rgb(var(--surface-2))]"
+            />
           ))}
         </div>
       ) : null}
@@ -137,33 +140,44 @@ export function PlacesDashboard() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-8 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-      <header className="panel p-5 sm:p-6">
-        <p className="inline-flex rounded-full border border-[rgba(var(--line),1)] bg-[rgb(var(--surface-2))] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-700))]">
+    <main className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+      <header className="hero-shell panel lift-in p-5 sm:p-6">
+        <p className="inline-flex rounded-full border border-[rgba(var(--accent),0.28)] bg-[rgba(var(--surface-2),0.88)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(var(--accent))]">
           Shared Food Journal
         </p>
         <h1 className="mt-3 text-3xl font-bold leading-tight text-[rgb(var(--ink-950))] sm:text-4xl">Anas and Saad Space</h1>
         <p className="mt-2 max-w-2xl text-sm text-[rgb(var(--ink-700))] sm:text-base">
-          Easy and clean. Add places, rate meals, and keep your best spots ranked together.
+          Simple to use, but not boring. Track your best meals, post photos, and keep your top spots up to date.
         </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a href="#ranking-board" className="quick-link">
+            View Ranking
+          </a>
+          <a href="#add-place" className="quick-link">
+            Add Place
+          </a>
+          <a href="#add-review" className="quick-link">
+            Add Review
+          </a>
+        </div>
 
         <div className="mt-5 grid grid-cols-3 gap-2.5 sm:max-w-md sm:gap-3">
-          <div className="rounded-xl border border-[rgba(var(--line),1)] bg-white px-3 py-2.5">
+          <div className="stat-tile">
             <p className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Places</p>
             <p className="mt-1 text-xl font-bold text-[rgb(var(--ink-950))]">{places.length}</p>
           </div>
-          <div className="rounded-xl border border-[rgba(var(--line),1)] bg-white px-3 py-2.5">
+          <div className="stat-tile">
             <p className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Reviews</p>
             <p className="mt-1 text-xl font-bold text-[rgb(var(--ink-950))]">{totalReviews}</p>
           </div>
-          <div className="rounded-xl border border-[rgba(var(--line),1)] bg-white px-3 py-2.5">
+          <div className="stat-tile">
             <p className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-[rgb(var(--ink-500))]">Top Score</p>
             <p className="mt-1 text-xl font-bold text-[rgb(var(--ink-950))]">{topScore === null ? "--" : topScore.toFixed(2)}</p>
           </div>
         </div>
       </header>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_minmax(320px,380px)]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_minmax(320px,390px)]">
         <BoardSection
           places={places}
           isLoading={isLoading}
