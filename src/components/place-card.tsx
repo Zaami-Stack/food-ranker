@@ -92,6 +92,21 @@ export function PlaceCard({ place, position, highlighted = false }: PlaceCardPro
                     {review.rating}/5
                   </span>
                 </p>
+                {review.imageUrl ? (
+                  <a
+                    href={review.imageUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 block overflow-hidden rounded-lg border border-[rgba(var(--line),0.8)]"
+                  >
+                    <div
+                      className="h-32 w-full bg-cover bg-center transition duration-300 hover:scale-[1.02]"
+                      style={{ backgroundImage: `url("${review.imageUrl}")` }}
+                      role="img"
+                      aria-label={`${review.foodName} photo`}
+                    />
+                  </a>
+                ) : null}
                 <p className="mt-1.5 text-[rgb(var(--ink-700))]">{review.comment || "No text comment provided."}</p>
                 <p className="mt-1.5 text-xs font-semibold text-[rgb(var(--ink-500))]">by {review.reviewerName}</p>
               </li>

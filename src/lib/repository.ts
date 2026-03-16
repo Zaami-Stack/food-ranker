@@ -23,12 +23,24 @@ type ReviewRow = {
   food_name: string;
   rating: number;
   comment: string | null;
+  image_url: string | null;
+  reviewer_name: string;
+  created_at: string;
+};
+
+type ReviewRowLegacy = {
+  id: string;
+  place_id: string;
+  food_name: string;
+  rating: number;
+  comment: string | null;
   reviewer_name: string;
   created_at: string;
 };
 
 const PLACE_COLUMNS = "id, name, location, cuisine, added_by, created_at";
-const REVIEW_COLUMNS = "id, place_id, food_name, rating, comment, reviewer_name, created_at";
+const REVIEW_COLUMNS = "id, place_id, food_name, rating, comment, image_url, reviewer_name, created_at";
+const REVIEW_COLUMNS_LEGACY = "id, place_id, food_name, rating, comment, reviewer_name, created_at";
 
 export class RepositoryError extends Error {
   constructor(
@@ -52,16 +64,21 @@ function toPlace(row: PlaceRow): Place {
   };
 }
 
-function toReview(row: ReviewRow): Review {
+function toReview(row: ReviewRow | ReviewRowLegacy): Review {
   return {
     id: row.id,
     placeId: row.place_id,
     foodName: row.food_name,
     rating: row.rating,
     comment: row.comment,
+    imageUrl: "image_url" in row ? row.image_url : null,
     reviewerName: row.reviewer_name,
     createdAt: row.created_at,
   };
+}
+
+function isImageUrlColumnMissing(error: DbError) {
+  return error.code === "42703" && error.message.toLowerCase().includes("image_url");
 }
 
 function toRepositoryError(error: DbError, action: "read" | "write"): RepositoryError {
@@ -125,6 +142,21 @@ export async function listPlacesWithStats() {
     .in("place_id", placeIds)
     .order("created_at", { ascending: false });
 
+  if (reviewError && isImageUrlColumnMissing(reviewError as DbError)) {
+    const { data: legacyReviewRows, error: legacyReviewError } = await supabase
+      .from("reviews")
+      .select(REVIEW_COLUMNS_LEGACY)
+      .in("place_id", placeIds)
+      .order("created_at", { ascending: false });
+
+    if (legacyReviewError) {
+      throw toRepositoryError(legacyReviewError as DbError, "read");
+    }
+
+    const reviews = (legacyReviewRows as ReviewRowLegacy[] | null)?.map(toReview) ?? [];
+    return buildPlaceWithStats(places, reviews);
+  }
+
   if (reviewError) {
     throw toRepositoryError(reviewError as DbError, "read");
   }
@@ -154,6 +186,28 @@ export async function getPlaceDetails(placeId: string): Promise<PlaceDetails | n
     .select(REVIEW_COLUMNS)
     .eq("place_id", placeId)
     .order("created_at", { ascending: false });
+
+  if (reviewError && isImageUrlColumnMissing(reviewError as DbError)) {
+    const { data: legacyReviewRows, error: legacyReviewError } = await supabase
+      .from("reviews")
+      .select(REVIEW_COLUMNS_LEGACY)
+      .eq("place_id", placeId)
+      .order("created_at", { ascending: false });
+
+    if (legacyReviewError) {
+      throw toRepositoryError(legacyReviewError as DbError, "read");
+    }
+
+    const place = toPlace(placeRow as PlaceRow);
+    const reviews = (legacyReviewRows as ReviewRowLegacy[] | null)?.map(toReview) ?? [];
+    return {
+      ...place,
+      averageRating: getAverageRating(reviews),
+      reviewCount: reviews.length,
+      latestReviews: reviews.slice(0, 3),
+      reviews,
+    };
+  }
 
   if (reviewError) {
     throw toRepositoryError(reviewError as DbError, "read");
@@ -200,17 +254,48 @@ export async function createPlace(input: PlaceInput): Promise<PlaceWithStats> {
 
 export async function createReview(input: ReviewInput): Promise<Review> {
   const supabase = getSupabaseAdminClient();
+  const insertPayload = {
+    place_id: input.placeId,
+    food_name: input.foodName,
+    rating: input.rating,
+    comment: input.comment ?? null,
+    image_url: input.imageUrl ?? null,
+    reviewer_name: input.reviewerName,
+  };
+
   const { data, error } = await supabase
     .from("reviews")
-    .insert({
-      place_id: input.placeId,
-      food_name: input.foodName,
-      rating: input.rating,
-      comment: input.comment ?? null,
-      reviewer_name: input.reviewerName,
-    })
+    .insert(insertPayload)
     .select(REVIEW_COLUMNS)
     .single();
+
+  if (error && isImageUrlColumnMissing(error as DbError)) {
+    if (input.imageUrl) {
+      throw new RepositoryError(
+        "Photo uploads need the latest database migration. Run migration 202603160002_add_review_images.sql first.",
+        "DB_WRITE_FAILED",
+        500,
+      );
+    }
+
+    const { data: legacyData, error: legacyError } = await supabase
+      .from("reviews")
+      .insert({
+        place_id: input.placeId,
+        food_name: input.foodName,
+        rating: input.rating,
+        comment: input.comment ?? null,
+        reviewer_name: input.reviewerName,
+      })
+      .select(REVIEW_COLUMNS_LEGACY)
+      .single();
+
+    if (legacyError) {
+      throw toRepositoryError(legacyError as DbError, "write");
+    }
+
+    return toReview(legacyData as ReviewRowLegacy);
+  }
 
   if (error) {
     throw toRepositoryError(error as DbError, "write");

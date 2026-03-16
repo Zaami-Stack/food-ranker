@@ -19,6 +19,15 @@ const optionalCleanString = (max: number, label: string) =>
     .optional()
     .transform((value) => (value && value.length > 0 ? value : undefined));
 
+const optionalUrl = (label: string) =>
+  z
+    .string()
+    .trim()
+    .url(`${label} must be a valid URL.`)
+    .max(2048, `${label} must be at most 2048 characters.`)
+    .optional()
+    .transform((value) => (value && value.length > 0 ? value : undefined));
+
 export const placeInputSchema = z.object({
   name: cleanString(2, 80, "Place name"),
   location: cleanString(2, 120, "Location"),
@@ -31,6 +40,7 @@ export const reviewInputSchema = z.object({
   foodName: cleanString(2, 80, "Food name"),
   rating: z.coerce.number().int().min(1, "Rating must be between 1 and 5.").max(5, "Rating must be between 1 and 5."),
   comment: optionalCleanString(280, "Comment"),
+  imageUrl: optionalUrl("Photo URL"),
   reviewerName: cleanString(2, 40, "Reviewer name"),
 });
 

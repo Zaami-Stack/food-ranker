@@ -21,6 +21,8 @@ type ReviewDraft = {
   reviewerName: string;
 };
 
+const PHOTO_ACCEPT_TYPES = "image/jpeg,image/png,image/webp,image/heic,image/heif";
+
 function getErrorMessage(payload: ApiFailure | undefined, fallback: string) {
   if (!payload) {
     return fallback;
@@ -44,6 +46,8 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
     comment: "",
     reviewerName: "",
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -67,6 +71,22 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
     }
   }, [draft.placeId, hasPlaces, placeIds, places, selectedPlaceId]);
 
+  useEffect(() => {
+    if (!photoFile) {
+      setPhotoPreviewUrl(null);
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(photoFile);
+    setPhotoPreviewUrl(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [photoFile]);
+
+  function clearPhoto() {
+    setPhotoFile(null);
+    setPhotoPreviewUrl(null);
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!hasPlaces) {
@@ -78,11 +98,25 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
     setSuccessMessage(null);
 
     try {
-      const response = await fetch("/api/reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(draft),
-      });
+      const response = photoFile
+        ? await fetch("/api/reviews", {
+            method: "POST",
+            body: (() => {
+              const formData = new FormData();
+              formData.set("placeId", draft.placeId);
+              formData.set("foodName", draft.foodName);
+              formData.set("rating", String(draft.rating));
+              formData.set("comment", draft.comment);
+              formData.set("reviewerName", draft.reviewerName);
+              formData.set("photo", photoFile);
+              return formData;
+            })(),
+          })
+        : await fetch("/api/reviews", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(draft),
+          });
 
       const payload = (await response.json()) as ApiSuccess<ReviewCreatePayload> | ApiFailure;
       if (!response.ok || !payload.success) {
@@ -98,6 +132,7 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
         rating: 4,
         comment: "",
       }));
+      clearPhoto();
       setSuccessMessage("Review added to ranking.");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Could not submit review.");
@@ -202,6 +237,44 @@ export function AddReviewForm({ places, selectedPlaceId, onCreated }: AddReviewF
           maxLength={280}
           disabled={!hasPlaces}
         />
+
+        <div>
+          <label className="app-label" htmlFor="review-photo">
+            Food Photo (Optional)
+          </label>
+          <input
+            id="review-photo"
+            type="file"
+            accept={PHOTO_ACCEPT_TYPES}
+            capture="environment"
+            onChange={(event) => {
+              const nextFile = event.target.files?.[0] ?? null;
+              setPhotoFile(nextFile);
+            }}
+            className="app-field mt-1 file:mr-3 file:rounded-lg file:border-0 file:bg-[rgb(var(--surface-2))] file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-[rgb(var(--ink-700))]"
+            disabled={!hasPlaces || isSubmitting}
+          />
+          <p className="mt-1 text-xs text-[rgb(var(--ink-500))]">Use camera or gallery. Max size: 5MB.</p>
+        </div>
+
+        {photoPreviewUrl ? (
+          <div className="rounded-xl border border-[rgba(var(--line),0.9)] bg-white p-2">
+            <div
+              className="h-40 w-full rounded-lg bg-cover bg-center"
+              style={{ backgroundImage: `url("${photoPreviewUrl}")` }}
+              role="img"
+              aria-label="Selected food photo preview"
+            />
+            <button
+              type="button"
+              onClick={clearPhoto}
+              className="mt-2 rounded-lg border border-[rgba(var(--line),0.9)] bg-[rgb(var(--surface-2))] px-3 py-1.5 text-xs font-bold text-[rgb(var(--ink-700))]"
+              disabled={isSubmitting}
+            >
+              Remove Photo
+            </button>
+          </div>
+        ) : null}
 
         {error ? (
           <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>

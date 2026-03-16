@@ -35,6 +35,7 @@ export type Review = {
   foodName: string;
   rating: number;
   comment: string | null;
+  imageUrl: string | null;
   reviewerName: string;
   createdAt: string;
 };

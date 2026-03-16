@@ -32,6 +32,7 @@ describe("reviewInputSchema", () => {
       foodName: "Beef Ramen",
       rating: "5",
       comment: "Amazing flavor",
+      imageUrl: "https://example.com/photo.jpg",
       reviewerName: "Friend",
     });
 
@@ -47,6 +48,18 @@ describe("reviewInputSchema", () => {
       foodName: "Beef Ramen",
       rating: 7,
       comment: "Too high",
+      reviewerName: "Friend",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects invalid image URLs", () => {
+    const result = reviewInputSchema.safeParse({
+      placeId: "11111111-1111-4111-8111-111111111111",
+      foodName: "Beef Ramen",
+      rating: 5,
+      imageUrl: "not-a-url",
       reviewerName: "Friend",
     });
 
